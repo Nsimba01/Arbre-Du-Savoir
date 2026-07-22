@@ -1,0 +1,57 @@
+{
+  "fiche": {
+    "id": "001",
+    "titre": "Fiche 001",
+    "langue": "fr",
+    "theme": "La souris",
+    "description": "Découverte et apprentissage sur la souris informatique"
+  },
+
+  "sections": [
+    {
+      "id": "japprends",
+      "titre": "J'apprends",
+      "audio": "fiches/06 - Numérique et informatique/001 - Découverte/fiche_001/medias/japprends.m4a",
+      "audioTooltip": "Lire",
+      "contenu": {
+        "texte": "Ici, tu vas apprendre ce qu'est une souris.",
+        "images": [
+          "fiches/06 - Numérique et informatique/001 - Découverte/fiche_001/medias/souris.png"
+        ]
+      }
+    },
+
+    {
+      "id": "jeretiens",
+      "titre": "Je retiens",
+      "audio": "fiches/06 - Numérique et informatique/001 - Découverte/fiche_001/medias/jeretiens.m4a",
+      "audioTooltip": "Lire",
+      "contenu": {
+        "texte": "Tu dois retenir qu'une souris est cela.",
+        "images": [
+          "fiches/06 - Numérique et informatique/001 - Découverte/fiche_001/medias/souris horizontale nue.png",
+          "fiches/06 - Numérique et informatique/001 - Découverte/fiche_001/medias/souris verticale nue.png"
+        ]
+      }
+    },
+
+    {
+      "id": "japplique",
+      "titre": "J'applique",
+      "audio": "fiches/06 - Numérique et informatique/001 - Découverte/fiche_001/medias/japplique.m4a",
+      "audioTooltip": "Lire",
+      "contenu": {
+        "texte": "A présent, c'est à toi de jouer ! Clique sur \"Je commence\" pour tester tes nouvelles connaissances.",
+        "images": []
+      }
+    }
+  ],
+
+  "jeu": {
+    "id": "fiche-001-jeu",
+    "titre": "Jeu pédagogique",
+    "bouton": "fiches/06 - Numérique et informatique/001 - Découverte/fiche_001/medias/Contenu.jpg",
+    "script": "fiches/06 - Numérique et informatique/001 - Découverte/fiche_001/medias/jeu.js",
+    "description": "Testez vos connaissances sur la souris"
+  }
+}

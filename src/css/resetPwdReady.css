@@ -1,0 +1,224 @@
+/* Masquer l'icône native "œil" et la croix de nettoyage dans Edge */
+.password-field input::-ms-reveal,
+.password-field input::-ms-clear {
+  display: none;
+}
+
+.reset-pwd-ready {
+  text-align: center;
+  margin-top: 10px;
+
+}
+
+.reset-pwd-ready .user-info {
+  text-align: left;
+  margin-bottom: 8px;
+}
+
+.reset-pwd-ready .user-info p {
+  margin-bottom: 0px;
+  display: flex; /* Ajoute flexbox */
+  align-items: center; /* Centre verticalement */
+  gap: 8px; /* Espace entre le label et la valeur */
+}
+
+
+
+.reset-pwd-ready .success {
+  color: green;
+  font-style: italic;
+}
+
+.reset-pwd-ready p {
+  font-size: 18px;
+  color: #070707;
+  margin-bottom: 10px;
+}
+
+.password-reset-form {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: rgb(153,102,51);
+  border-radius: 10px;
+  border: 1px solid black;
+}
+
+.password-reset-form label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.password-reset-form input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.password-reset-form input:focus {
+  border: 2px solid RGB(51,204,51);
+  outline: none;
+}
+
+
+.error {
+  color: red;
+  margin-bottom: 15px;
+}
+
+.submit-btn {
+
+  padding: 10px;
+
+  color: black;
+  border: 1px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.2s;
+  margin-bottom: 5px;
+  margin-top: 10px;
+  width: 130px;
+}
+
+.submit-btn:disabled {
+
+  cursor: not-allowed;
+  color:rgb(14, 5, 5);
+  border: 1px solid black;
+  background-color: rgb(211,211,211);
+  margin-top: 10px;
+
+}
+
+#password-validation {
+
+  margin-bottom: 13px;
+  margin-top: 10px;
+
+}
+
+
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+
+
+.password-field input {
+  width: 100%;
+  padding-right: 30px;
+  margin-bottom: 10px;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color:black;
+}
+
+.validation {
+  margin-top: -10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  text-align: left;
+}
+
+.validation .ok {
+  color: green;
+}
+
+.validation .nok {
+  color: red;
+}
+
+
+.pseudo_email{
+
+  font-size: 15px;
+  margin-left:  -27px ;
+}  
+
+
+
+
+
+@media screen and (min-width:0px) and (max-width:1920px) {
+
+  .password-reset-form {
+    max-height: 35vh; /* Même valeur que ton autre formulaire */
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-bottom: 10px;
+  }
+  
+  /* Style de la scrollbar (webkit - Chrome, Safari, Edge) */
+  .password-reset-form::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .password-reset-form::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+  
+  .password-reset-form::-webkit-scrollbar-thumb {
+    background: rgba(51, 204, 51, 0.6);
+    border-radius: 10px;
+  }
+  
+  .password-reset-form::-webkit-scrollbar-thumb:hover {
+    background: rgba(51, 204, 51, 0.8);
+  }
+  
+  /* Pour Firefox */
+  .password-reset-form {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(51, 204, 51, 0.6) rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Réduire les font-size pour mobile */
+  .password-reset-form p {
+    font-size: 0.875rem; /* 14px */
+  }
+  
+.pseudo_email {
+  font-size: 0.9375rem; /* 15px */
+  margin-left: 8px; /* Espace positif au lieu de négatif */
+  display: inline; /* Force l'affichage inline */
+}
+
+}
+
+
+
+@media screen and (min-width:361px) and (max-width:375) {
+
+
+
+}
+
+
+
+
+
+
+@media (max-width: 600px) {
+  .password-reset-form {
+    padding: 10px;
+  }
+}
+
+
+
+
+
+

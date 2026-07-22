@@ -1,0 +1,60 @@
+
+* {
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+}
+
+
+
+/* src/index.css (ou App.css importé une fois au démarrage) */
+button,
+input[type="submit"],
+input[type="button"] {
+  width: 130px;   /* largeur fixe, identique partout */
+  height: 30px;   /* hauteur fixe, identique partout */
+}
+
+.formulaire p {
+
+  font-size: 19px;
+  font-style: bold;
+
+}
+
+
+.formulaire-reset-pwd p {
+  font-size: 15px;
+}
+
+.password-reset-form h4 {
+  font-size: 19px;
+}
+
+/* Style pour les liens spécifiques */
+.link,
+.form-login .link,
+.formulaire .link {
+  font-style: italic;
+  text-decoration: underline;
+  text-align: center;
+  font-size: 13px!important;
+  display: block;
+  margin: 10px auto; /* Centre le lien et ajoute un espacement */
+  font-size: 0.9em; /* Taille de police légèrement plus petite que le texte du bouton */
+  color: black; /* Couleur du texte */
+  cursor: pointer; /* Curseur en forme de main */
+
+  
+}
+
+.linkHoverForm{
+
+   padding-bottom: 4px; /* Ajoute un espacement en bas */
+   font-style: italic;
+   font-size: 13px;
+   
+
+}
+
+input[type="password"]::-ms-reveal {
+  display: none;
+}

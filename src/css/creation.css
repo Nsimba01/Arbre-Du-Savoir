@@ -1,0 +1,276 @@
+/* Vos styles existants pour le formulaire */
+.formulaireCreate {
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 10px;
+  background-color:  rgb(153, 102, 51);
+  color: black;
+  border-radius: 5px;
+  margin-top: 10px;
+  margin-bottom: 30px;
+  text-align: center;
+  border:1px solid black; 
+}
+
+.formulaireCreate form {
+
+  padding-left: 10%;
+  padding-right: 10%;
+}
+
+.formulaireCreate p {
+  text-align: center;
+  margin-bottom: 30px;
+  margin-top: 10px;
+  font-size: 19px;
+  font-weight: bold;
+}
+
+/* Styles pour les lignes du formulaire */
+.form-row-creation, .form-row-create {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* Styles pour les labels */
+.form-row-creation label, .form-row-create label {
+  min-width: 150px; /* Largeur fixe plus grande pour aligner les labels */
+  margin-right: 10px;
+  text-align: left;
+  font-weight: normal;
+  font-size:15px;
+}
+
+/* Styles pour les conteneurs d'entrée */
+.input-container-create {
+  flex: 1;
+  position: relative;
+  width: 100%;
+}
+
+/* Assurez-vous que les champs prennent toute la largeur disponible */
+
+.input-container-create select {
+  width: 100%; /* Assure que le champ prend toute la largeur disponible */
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box; /* Inclut le padding et la bordure dans la largeur */
+  font-size: 15px;
+  height:30px;
+
+  border:1px solid black;
+
+}
+
+.input-container-create input {
+  width: 100%; /* Assure que le champ prend toute la largeur disponible */
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box; /* Inclut le padding et la bordure dans la largeur */
+  font-size: 15px;
+  height:25px;
+
+  border:1px solid black;
+
+}
+
+
+
+.input-container-create input[type="text"],.input-container-create input[type="email"]{
+
+    font-size: 15px;
+
+}
+
+.input-container-create input:focus {
+
+
+  border: 2px solid RGB(51,204,51);
+  outline: none;
+  
+
+}
+
+
+
+.input-container-create select:focus {
+
+  border: 2px solid rgb(146, 208, 80);
+  outline: none;
+
+}
+
+/* Ajustements spécifiques pour les champs de type password */
+.input-container-create input[type="password"] {
+  padding-right: 35px; /* Espace pour l'icône */
+}
+
+/* Ajuster le champ de date pour inclure la hauteur uniforme */
+.input-container-create input[type="date"] {
+  width: 100%; /* Assure que le champ de date prend toute la largeur disponible */
+  padding: 4px;
+  box-sizing: border-box;
+  height:30px;
+}
+
+/* Ajustements spécifiques pour Mozilla/Firefox */
+@-moz-document url-prefix() {
+  .input-container-create input[type="password"] {
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 15px;
+    height:25px;
+    border:1px solid black;
+  }
+  .input-container-create input[type="password"] + span {
+    top: 50% !important;
+    transform: translateY(-50%);
+  }
+
+
+  .input-container-create select {
+  background-color: white;
+  width: 100%; /* Assure que le champ prend toute la largeur disponible */
+  padding: 4px;
+  border: 1px solid black;
+  border-radius: 5px;
+  box-sizing: border-box; /* Inclut le padding et la bordure dans la largeur */
+  font-size: 15px;
+  height: 30px; /* Hauteur fixe pour tous les champs */
+}
+.input-container-create input:focus {
+
+
+  border: 2px solid RGB(51,204,51);
+  outline: none;
+  
+
+}
+}
+
+/* Styles pour le bouton de soumission */
+#aligner-button-create {
+  display: block;
+  margin: 0 auto;
+  font-size: 15px;
+  color: black;
+  margin-bottom: 10px;
+  font-weight: bold;
+  margin-top: 10px;
+  border-radius: 8px;
+}
+
+/* Style pour le lien "Déjà un espace ?" */
+.formulaireCreate p.link {
+  font-weight: normal;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: underline;
+  color: black;
+  font-style: italic;
+  font-size: 13px;
+  margin-bottom: 5%;
+}
+
+
+@media screen and (min-width:0px) and (max-width:1920px){
+  
+  .formulaireCreate {
+    max-height: 35vh; /* Hauteur maximale du conteneur */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .formulaireCreate form {
+    overflow-y: auto; /* Active le scroll vertical */
+    flex: 1;
+    padding-right: 5%; /* Réduit le padding pour laisser place à la scrollbar */
+  }
+  
+  /* Style de la scrollbar (webkit - Chrome, Safari, Edge) */
+  .formulaireCreate form::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .formulaireCreate form::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+  
+  .formulaireCreate form::-webkit-scrollbar-thumb {
+    background: rgba(51, 204, 51, 0.6);
+    border-radius: 10px;
+  }
+  
+  .formulaireCreate form::-webkit-scrollbar-thumb:hover {
+    background: rgba(51, 204, 51, 0.8);
+  }
+  
+  /* Pour Firefox */
+  .formulaireCreate form {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(51, 204, 51, 0.6) rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Labels empilés sur mobile */
+  .form-row-creation {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .form-row-creation label {
+    min-width: auto;
+    margin-bottom: 5px;
+    width: 100%;
+  }
+
+  .msg-error-320px{
+
+    margin-top: "-10%" !important;
+  
+
+}
+
+}
+
+
+/* Styles pour les messages de validation */
+.validation-message {
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Critères et validation */
+.criteria {
+  transition: opacity 1s ease;
+  opacity: 1;
+  font-size: 11px;
+  margin-top: 8px;
+}
+
+.criteria.hidden {
+  opacity: 0;
+}
+
+.criteria span {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.criteria span.green {
+  color: green;
+}
+
+.criteria span.red {
+  color: red;
+}
+
+.validation-message {
+  font-size: 14px;
+  margin-top: 5px;
+}

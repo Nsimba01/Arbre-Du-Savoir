@@ -1,0 +1,500 @@
+/* =====================================================
+   connexion.css — styles pour la page / formulaire
+   ===================================================== */
+
+/* Conteneur générique */
+.formulaire {
+  max-width: 300px;
+  margin: 0 auto;
+  padding: 10px;
+  background-color: rgb(153,102,51);
+  color: black;
+  border-radius: 5px;
+  margin-top: 10px;
+  margin-bottom: 30px;
+  text-align: center;
+  border: 1px solid black;
+}
+
+/* Conteneur principal du formulaire de réinitialisation */
+.formulaire-reset-pwd {
+  max-width: 530px;
+  width: 67%;
+  margin: 0 auto;
+  padding: 10px;
+  background-color: rgb(153,102,51);
+  color: black;
+  border-radius: 5px;
+  margin-top: 20px;
+  margin-bottom: 30px;
+  text-align: center;
+  border: 1px solid black;
+  max-height: 85vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.3) rgba(0, 0, 0, 0.1);
+}
+
+.formulaire-reset-pwd::-webkit-scrollbar {
+  width: 6px;
+}
+
+.formulaire-reset-pwd::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 0 5px 5px 0;
+}
+
+.formulaire-reset-pwd::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+}
+
+.formulaire-reset-pwd::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+@supports (-moz-appearance: none) {
+  .formulaire-reset-pwd {
+    height: 210px;
+  }
+}
+
+/* Cible Chrome, Edge, Opera (navigateurs Chromium) */
+@supports (-webkit-appearance: none) and (not (-moz-appearance: none)) {
+  .formulaire-reset-pwd {
+    height: 230px;
+  }
+}
+
+.formulaire-reset-pwd h2 {
+  margin-top: 10px;
+  margin-bottom: 30px;
+}
+
+/* Conteneur global du formulaire */
+.reset-pwd-form {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  margin-top: -30px;
+}
+
+/* Mode "reset" : colonne et éléments centrés par défaut */
+.reset-pwd-form--reset {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Classe additionnelle pour forcer centrage et largeur */
+.reset-pwd-form--reset.centered-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+}
+
+/* Label centré par défaut (texte au-dessus du champ) */
+.centered-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-size: 15px;
+  width: 100%;
+  max-width: 480px;
+}
+
+.label-inline {
+  flex-direction: row;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* --- Variante inline : label et champ sur la même ligne --- */
+.inline-label {
+  flex-direction: row;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Texte du label (utile pour spacing ou style) */
+.label-text {
+  white-space: nowrap;
+  font-size: 15px;
+  margin-left: -10px;
+}
+
+/* Champs input / select commun */
+.centered-input {
+  width: 40%;
+  max-width: 360px;
+  height: 33px;
+  padding: 6px 8px;
+  margin-top: 0;
+  border: 1px solid black;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 15px;
+}
+
+#mail_process_reset_pwd {
+  width: 40%;
+  max-width: 360px;
+  height: 28px;
+  padding: 6px 8px;
+  margin-top: 6px;
+  border: 1px solid black;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 15px;
+  max-width: 340px;
+}
+
+#mail_process_reset_pwd:focus {
+  border: 2px solid RGB(51,204,51);
+  outline: none;
+}
+
+/* Overrides pour les inputs placés en inline (pas d'espacement vertical) */
+.inline-input {
+  margin-top: 0;
+  max-width: 340px;
+}
+
+/* Focus styles */
+.centered-input:focus,
+.input-container input:focus {
+  border: 2px solid RGB(51,204,51);
+  outline: none;
+}
+
+.input-container {
+  margin-bottom: 10px;
+}
+
+/* Styles pour select afin qu'il ressemble à l'input */
+.select-pseudo {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: none;
+  padding-right: 10px;
+}
+
+/* Bouton centré sous le champ */
+#aligner-button {
+  align-self: center;
+  margin-top: 8px;
+  width: 130px;
+  height: 30px;
+  font-size: 15px;
+  font-weight: bold;
+  border-radius: 5px;
+  border: 1px solid black;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: -70%;
+}
+
+/* Couleurs du bouton (enabled / disabled) */
+.formulaire-reset-pwd #aligner-button:enabled {
+  background-color: rgb(146,208,80);
+}
+.formulaire-reset-pwd #aligner-button:disabled {
+  background-color: rgb(211,211,211);
+  color: #0e0d0d;
+  border: 1px solid black;
+  cursor: not-allowed;
+}
+
+/* Messages (success / error / info) */
+.message-success {
+  color: RGB(51,204,51);
+  font-weight: normal;
+  margin-top: -3px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.message-error {
+  color: red;
+  margin-top: 10px;
+  font-weight: normal;
+  font-size: 15px;
+  text-align: center;
+}
+
+#info-message-id {
+  color: RGB(51,204,51);
+  margin-bottom: 38px;
+  font-size: 15px;
+  text-align: center;
+}
+
+/* Conteneur / layout réutilisables */
+.field-1 {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.1%;
+  flex-wrap: wrap;
+}
+
+.field-1 label {
+  flex: 0 0 100px;
+  margin-right: 6px;
+  text-align: left;
+  font-size: 15px;
+}
+
+.field-2 {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.field-2 label {
+  flex: 0 0 100px;
+  margin-right: 6px;
+  text-align: left;
+  font-size: 15px;
+}
+
+.input-container {
+  flex: 1;
+  position: relative;
+}
+
+.input-container input {
+  width: 100%;
+  height: 25px;
+  padding: 2px 8px 4px 4px;
+  border: 1px solid black;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 15px;
+}
+
+#motdepasse {
+  padding-right: 35px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 8px;
+  top: 58%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+/* Messages de validation */
+.validation-message {
+  margin-bottom: 10px;
+  margin-top: 10px;
+  font-family: 'Comic Sans MS';
+  font-weight: normal;
+  font-size: 13px;
+}
+
+#password-validation {
+  margin-top: 18px;
+  font-family: 'Comic Sans MS';
+  font-weight: normal;
+  font-size: 13px;
+}
+
+/* Ancien style d'erreur (si utilisé) */
+.formulaire p.error-message {
+  font-family: 'Comic Sans MS';
+  font-weight: normal;
+  font-size: 15px;
+  color: red;
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+.formulaire p {
+  margin-bottom: 30px;
+  margin-top: 10px;
+  font-size: 19px;
+  font-weight: bold;
+}
+
+/* Bouton générique (au cas où utilisé ailleurs) */
+.submit-btn {
+  color: black;
+  border: none;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  height: 30px;
+  padding: 0 20px;
+  width: 130px;
+}
+
+/* Bouton désactivé générique */
+.submit-btn:disabled {
+  background-color: rgb(211,211,211);
+  color: #0e0d0d;
+  border: 3px solid black;
+}
+
+/* Style des liens */
+.link {
+  cursor: pointer;
+  margin-top: 6px;
+  font-style: italic;
+  text-decoration: underline;
+}
+
+@media screen and (min-width:0px) and (max-width:540px) {
+
+  .message-success {
+    font-size: 0.8125rem !important;
+    margin-top: -2.0625rem !important;
+  }
+
+  .formulaire {
+    height: 235px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .formulaire::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .formulaire::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+
+  .formulaire::-webkit-scrollbar-thumb {
+    background: rgba(51, 204, 51, 0.6);
+    border-radius: 10px;
+  }
+
+  .formulaire::-webkit-scrollbar-thumb:hover {
+    background: rgba(51, 204, 51, 0.8);
+  }
+
+  .formulaire {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(51, 204, 51, 0.6) rgba(0, 0, 0, 0.1);
+  }
+
+  #link_form_top {
+    margin-top: -10px;
+  }
+
+  #button-connexion {
+    margin-bottom: 25px;
+    margin-top: 25px;
+  }
+
+  .input-container input[type="password"] {
+    margin-bottom: -40%;
+  }
+
+  .reset-pwd-form {
+    margin-top: -58px;
+  }
+
+  .message-error {
+    color: red;
+    margin-top: 10px;
+    font-weight: normal;
+    font-size: 11.7px !important;
+    text-align: center;
+  }
+
+  .field-2 {
+    margin-bottom: 15px;
+  }
+
+  .formulaire p.error-message {
+    margin-top: 8%;
+  }
+}
+
+/* Responsive : adaptatif pour écrans étroits */
+@media screen and (min-width: 600px) and (max-width: 600px) {
+
+  .form-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-row label {
+    flex: none;
+    margin-bottom: 4px;
+  }
+
+  .input-container {
+    width: 100%;
+  }
+
+  .formulaire-reset-pwd {
+    max-width: 800px;
+    width: 70%;
+    margin: 0 auto;
+    padding: 10px;
+    border: 1px solid black;
+    background-color: rgb(153,102,51);
+    color: black;
+    border-radius: 5px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    text-align: center;
+    gap: 30%;
+  }
+
+  .reset-pwd-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .select-pseudo {
+    margin-right: -25%;
+  }
+
+  .inline-input {
+    max-width: 70%;
+  }
+
+  #aligner-button {
+    width: 90%;
+    max-width: 320px;
+  }
+
+  .formulaire-reset-pwd {
+    width: 90%;
+  }
+
+  .centered-input {
+    max-width: 100%;
+  }
+}
+
+/* Petits ajustements finaux */
+#aligner-button {
+  transition: transform 0.08s ease;
+}
+#aligner-button:active {
+  transform: translateY(1px);
+}

@@ -1,0 +1,104 @@
+/* ---------------------------------------------------------
+   SECTION GLOBALE
+   --------------------------------------------------------- */
+.fiche-section {
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+
+  /* Pour éviter que les images débordent */
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------
+   HEADER : Titre + Audio
+   --------------------------------------------------------- */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Titre à gauche, audio à droite */
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+/* ---------------------------------------------------------
+   TEXTE DE LA SECTION
+   --------------------------------------------------------- */
+.section-text {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: #444;
+  margin-bottom: 1.5rem;
+}
+
+/* ---------------------------------------------------------
+   IMAGES : grille responsive
+   --------------------------------------------------------- */
+.section-images {
+  display: grid;
+
+  /* 2 colonnes sur écran large */
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Les images doivent toujours s'adapter */
+.section-images img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+
+  /* Empêche le clic droit (visuel seulement, pas sécurité totale) */
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE : TABLETTES
+   --------------------------------------------------------- */
+@media (max-width: 900px) {
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .section-title {
+    font-size: 1.4rem;
+  }
+
+  .section-text {
+    font-size: 1.1rem;
+  }
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE : MOBILES
+   --------------------------------------------------------- */
+@media (max-width: 600px) {
+  .fiche-section {
+    padding: 1rem;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+  }
+
+  .section-text {
+    font-size: 1rem;
+  }
+
+  .section-images {
+    grid-template-columns: 1fr; /* Une seule colonne sur mobile */
+  }
+}

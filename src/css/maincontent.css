@@ -1,0 +1,243 @@
+
+.module_container{
+
+  color: black;   
+          
+  width:100%; 
+
+  display:flex; /*  aligne les elements de container */
+
+  justify-content: space-around;
+
+  flex-wrap: wrap;
+
+  margin-top:10%;
+
+
+             
+
+}
+
+.home_fiche001_link {
+  text-decoration: none;
+}
+
+.home_fiche001_button {
+  width: auto;
+  min-width: max-content;
+  height: auto;
+  min-height: 42px;
+  line-height: 1.2;
+  white-space: nowrap;
+  border: 2px solid black;
+  border-radius: 12px;
+  background-color: rgba(199, 216, 67, 0.699);
+  color: black;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 10px 18px;
+  cursor: pointer;
+}
+
+.home_fiche001_button:hover {
+  background-color: rgba(199, 216, 67, 0.9);
+}
+
+.module_element{
+
+  padding: 8px 16px;
+  border-radius: 45px;
+  border: 4px solid black;
+  background-color:rgba(199, 216, 67, 0.699);
+  align-items: center;
+
+
+}
+
+.module_element h1{
+
+  font-size: 1.8rem;
+  font-weight: 700;
+
+}
+
+.module_element img{
+
+  padding: 8px 16px;
+
+
+  width:150px;
+
+  height:150px;
+  
+}
+
+  
+@media screen and (min-width:0px) and (max-width:540px){
+
+
+.module_container{
+
+  color: black;
+
+  width:100%; 
+
+  display:flex; /*  aligne les elements de container */
+
+  justify-content: space-around;
+
+  flex-wrap: wrap;
+
+  margin-top:5%;
+
+  margin-bottom: -1%;
+
+ 
+
+}
+
+
+.module_element{
+
+  padding: 8px 16px;
+  border-radius: 45px;
+  border: 4px solid black;
+  background-color:rgba(199, 216, 67, 0.699);
+  align-items: center;
+  width: 50%;
+
+
+}
+
+.module_element h1{
+
+  font-size: 1.5rem;
+  font-weight: 700;
+
+}
+
+.module_element img{
+
+  padding: 8px 16px;
+
+
+  width:130px;
+
+  height:130px;
+  
+}
+
+
+}
+
+@media screen and (min-width:541px) and (max-width:1023px){
+  
+
+.module_container{
+
+  color: black;
+
+  width:100%; 
+
+  display:flex; /*  aligne les elements de container */
+
+  justify-content: space-around;
+
+  flex-wrap: wrap;
+
+
+
+
+
+}
+
+.module_element{
+
+  padding: 8px 16px;
+  border-radius: 45px;
+  border: 4px solid black;
+  background-color:rgba(199, 216, 67, 0.699);;
+
+  
+}
+
+.module_element h1{
+
+  font-size: 1.7rem;
+  font-weight: 700;
+
+}
+
+.module_element img{
+
+  width:140px;
+
+  height:140px;
+
+}
+  
+/*
+
+@media screen and (min-width:0px) and (max-width:1023px){
+  
+
+
+
+}
+
+
+*/
+
+
+/*AJOUT */ 
+
+  
+a{ 
+
+     
+
+  text-decoration: none;
+
+  color:black;  
+}
+
+
+
+
+
+
+
+}
+
+
+
+@media screen and (min-width:1024px){
+
+
+.module_container{
+
+  margin-top:7%;
+
+
+}
+
+
+}
+
+
+/*AJOUT */ 
+
+  
+a{ 
+
+     
+
+  text-decoration: none;
+
+  color:black;  
+}
+
+
+
+
+
