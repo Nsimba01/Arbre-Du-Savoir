@@ -30,6 +30,11 @@ function ProfileModal({ onClose }) {
   const [emailValidation, setEmailValidation] = useState(false);
   const pseudoTimeoutRef = React.useRef(null);
 
+  // --- Upload avatar (glisser-déposer / parcourir) ---
+  const [showAvatarUpload, setShowAvatarUpload] = useState(false);
+  const fileInputRef = React.useRef(null);
+  const avatarPopupRef = React.useRef(null);
+
   useEffect(() => {
     if (!pseudo) { setLoading(false); return; }
     const fetchUser = async () => {
@@ -45,6 +50,19 @@ function ProfileModal({ onClose }) {
     };
     fetchUser();
   }, [pseudo]);
+
+  // Ferme le popup d'upload avatar si on clique en dehors
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (avatarPopupRef.current && !avatarPopupRef.current.contains(e.target)) {
+        setShowAvatarUpload(false);
+      }
+    };
+    if (showAvatarUpload) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showAvatarUpload]);
 
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) onClose();
@@ -177,7 +195,7 @@ function ProfileModal({ onClose }) {
       // --- Autres champs sans changement de pseudo ---
       await update(ref(db, `users/${pseudo}`), updates);
       setUserData(prev => ({ ...prev, ...updates }));
-      
+
       await notifyEmails(pseudo);
 
       handleCancel();
@@ -239,7 +257,7 @@ function ProfileModal({ onClose }) {
 
   const renderValidationMessage = (fieldKey) => {
     if (newFieldFocused !== fieldKey) return null;
-  
+
 
     if (fieldKey === 'password') {
           const pwdEmpty = (pendingChanges['password'] || '').length === 0;
@@ -285,6 +303,37 @@ if (fieldKey === 'email') {
     return null;
   };
 
+  // --- Handlers upload avatar ---
+  const handleAvatarEditClick = () => {
+    // Le popup ne s'ouvre que sur écran > 480px (mobile exclu)
+    if (window.innerWidth > 480) {
+      setShowAvatarUpload(prev => !prev);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      // TODO : traiter l'upload du fichier (ex: envoi vers Firebase Storage)
+      console.log('Fichier déposé :', file);
+    }
+    setShowAvatarUpload(false);
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // TODO : traiter l'upload du fichier (ex: envoi vers Firebase Storage)
+      console.log('Fichier sélectionné :', file);
+    }
+    setShowAvatarUpload(false);
+  };
+
   const passwordsMatch = confirmPassword === (pendingChanges['password'] || '');
   const age = userData?.dateNaissance ? Math.floor((new Date() - new Date(userData.dateNaissance)) / (365.25 * 24 * 60 * 60 * 1000)) : null;
 
@@ -310,7 +359,7 @@ if (fieldKey === 'email') {
           <>
             <div className="profile-header">
               <span className="profile-pseudo-title">{pseudo || '—'}</span>
-             
+
              {saveMessage && (
                   <p style={{ color: saveMessage.startsWith('La mise à jour') ? 'RGB(51,204,51)' : 'red', margin: '8px 0 0', fontSize: '0.85rem', textAlign: 'center' }}>
                     {saveMessage}
@@ -334,10 +383,51 @@ if (fieldKey === 'email') {
             </div>
             <div className="profile-divider" />
             <div className="profile-body">
+
               <div className="profile-avatar">
                 <img src={btn_on_connexion} alt="Profil connecté" className="profile-avatar-img" onContextMenu={e => e.preventDefault()} />
-                <HiPencil size={14} color="black" style={{ display: 'block', margin: '6px auto 0' }} />
+                <HiPencil
+                  size={14}
+                  color="black"
+                  style={{ display: 'block', margin: '6px auto 0', cursor: 'pointer' }}
+                  onClick={handleAvatarEditClick}
+                  title="Modifier la photo de profil"
+                />
+
+                {showAvatarUpload && (
+                  <div className="avatar-upload-popup" ref={avatarPopupRef}>
+                    <div
+                      className="avatar-upload-dropzone"
+                      onDragOver={handleDragOver}
+                      onDrop={handleDrop}
+                      onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                    >
+                      <span className="avatar-upload-icon">⬇️</span>
+                      <p>
+                        Glissez-déposez une image ici
+                        <br />
+                        <span className="avatar-upload-optional">(Optionnel)</span>
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      className="avatar-upload-browse-btn"
+                      onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                    >
+                      📁 Parcourir les fichiers
+                    </button>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={fileInputRef}
+                      style={{ display: 'none' }}
+                      onChange={handleFileSelect}
+                    />
+                  </div>
+                )}
               </div>
+
+              
               <div className="profile-info">
                 {fields.map(({ label, value, fieldKey, masked, type }) => (
                   <div key={label} className="profile-field-block">
@@ -356,7 +446,7 @@ if (fieldKey === 'email') {
                           <span className="profile-edit-label">Actuel </span>
                           <div style={{ position: 'relative', flex: 1 }}>
 
-                          <input type={masked ? (showCurrentPassword ? 'text' : 'password') : 'text'} value={value === '—' ? '' : value} disabled title={label} className="profile-edit-input profile-edit-input--disabled" style={{ width: '100%', paddingRight: masked ? '32px' : '8px', boxSizing: 'border-box' }} />                           
+                          <input type={masked ? (showCurrentPassword ? 'text' : 'password') : 'text'} value={value === '—' ? '' : value} disabled title={label} className="profile-edit-input profile-edit-input--disabled" style={{ width: '100%', paddingRight: masked ? '32px' : '8px', boxSizing: 'border-box' }} />
                            {masked && (
                               <span onClick={() => setShowCurrentPassword(p => !p)} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', fontSize: '15px' }}>
                                 {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
@@ -377,7 +467,7 @@ if (fieldKey === 'email') {
 
                               <input type={masked ? (showNewPassword ? 'text' : 'password') : (type || 'text')} className="profile-edit-input" placeholder={['Pseudo', 'Prénom', 'Mail', 'Mot de passe', 'Nom'].includes(label) ? '' : `Nouveau ${label.toLowerCase()}`} value={pendingChanges[fieldKey] || ''} onChange={e => handlePendingChange(fieldKey, e.target.value)} onFocus={() => setNewFieldFocused(fieldKey)} onBlur={() => setNewFieldFocused(null)} title={label} style={{ width: '100%', paddingRight: masked ? '32px' : '8px', boxSizing: 'border-box' }} />
 
-                           
+
                            )}
                             {masked && (
                               <span onClick={() => setShowNewPassword(p => !p)} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', fontSize: '15px' }}>
@@ -393,7 +483,7 @@ if (fieldKey === 'email') {
                               <span className="profile-edit-label">Confirmation </span>
                               <div style={{ position: 'relative', flex: 1 }}>
 
-                                <input type={showConfirmPassword ? 'text' : 'password'} className="profile-edit-input" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} onFocus={() => setConfirmPasswordFocused(true)} onBlur={() => setConfirmPasswordFocused(false)} title="Confirmation du mot de passe" style={{ width: '100%', paddingRight: '32px', boxSizing: 'border-box' }} />                                
+                                <input type={showConfirmPassword ? 'text' : 'password'} className="profile-edit-input" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} onFocus={() => setConfirmPasswordFocused(true)} onBlur={() => setConfirmPasswordFocused(false)} title="Confirmation du mot de passe" style={{ width: '100%', paddingRight: '32px', boxSizing: 'border-box' }} />
                                 <span onClick={() => setShowConfirmPassword(p => !p)} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', fontSize: '15px' }}>
                                   {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                                 </span>

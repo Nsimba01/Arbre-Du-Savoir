@@ -341,3 +341,78 @@
     padding-left: 76px;
   }
 }
+
+
+/* AJOUT 28 juillet 2026 */
+
+
+/* --- Popup upload avatar --- */
+
+.avatar-upload-popup {
+  display: none; /* masqué par défaut, sécurité en plus du check JS */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  padding: 14px;
+  width: 240px;
+}
+
+/* Affiché uniquement au-dessus de 480px */
+@media (min-width: 481px) {
+  .avatar-upload-popup {
+    display: block;
+  }
+}
+
+.avatar-upload-dropzone {
+  border: 2px dashed rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  padding: 22px 10px;
+  text-align: center;
+  font-size: 13px;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.avatar-upload-dropzone:hover {
+  border-color: RGB(51,204,51);
+  background: rgba(51, 204, 51, 0.05);
+}
+
+.avatar-upload-icon {
+  font-size: 22px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.avatar-upload-optional {
+  font-size: 11px;
+  color: #777;
+}
+
+.avatar-upload-browse-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  background: #f5f5f5;
+  cursor: pointer;
+  font-size: 13px;
+  color: #121111;
+  transition: background 0.2s;
+}
+
+.avatar-upload-browse-btn:hover {
+  background: #ebebeb;
+}
