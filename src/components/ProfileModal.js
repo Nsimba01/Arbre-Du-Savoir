@@ -4,6 +4,7 @@ import { AuthContext } from './AuthContext';
 import bcrypt from 'bcryptjs';
 import emailjs from 'emailjs-com';
 import btn_on_connexion from '../medias/connexion_on.png';
+import infobulle_glisserdeposer from '../medias/infobulle_glisserdeposer.png';
 import { HiPencil } from 'react-icons/hi';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import '../css/ProfileModal.css';
@@ -401,20 +402,25 @@ if (fieldKey === 'email') {
                       onDragOver={handleDragOver}
                       onDrop={handleDrop}
                       onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                      title="Permet de cliquer-glisser ta photo directement pour l'ajouter à ton profil"
                     >
-                      <span className="avatar-upload-icon">⬇️</span>
                       <p>
-                        Glissez-déposez une image ici
+                        Glisser ma photo
                         <br />
                         <span className="avatar-upload-optional">(Optionnel)</span>
                       </p>
+                      <img
+                        src={infobulle_glisserdeposer}
+                        alt="Illustration glisser-déposer"
+                        className="avatar-upload-illustration"
+                      />
                     </div>
                     <button
                       type="button"
                       className="avatar-upload-browse-btn"
                       onClick={() => fileInputRef.current && fileInputRef.current.click()}
                     >
-                      📁 Parcourir les fichiers
+                      📁 Importer ma photo
                     </button>
                     <input
                       type="file"
