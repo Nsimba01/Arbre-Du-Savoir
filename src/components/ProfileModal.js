@@ -404,7 +404,7 @@ if (fieldKey === 'email') {
                       onClick={() => fileInputRef.current && fileInputRef.current.click()}
                       title="Permet de cliquer-glisser ta photo directement pour l'ajouter à ton profil"
                     >
-                      <p>
+                      <p style={{ fontSize: '13px' }}>
                         Glisser ma photo
                         <br />
                         <span className="avatar-upload-optional">(Optionnel)</span>

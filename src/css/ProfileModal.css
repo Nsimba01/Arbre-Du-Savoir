@@ -375,7 +375,7 @@
   padding: 22px 10px;
   text-align: center;
   font-size: 13px;
-  color: #333;
+  color:black;
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s;
 }
@@ -409,7 +409,7 @@
   background: #f5f5f5;
   cursor: pointer;
   font-size: 13px;
-  color: #121111;
+  color: black;
   transition: background 0.2s;
 }
 
