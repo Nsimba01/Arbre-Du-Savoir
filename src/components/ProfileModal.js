@@ -386,7 +386,7 @@ if (fieldKey === 'email') {
             <div className="profile-body">
 
               <div className="profile-avatar">
-                <img src={btn_on_connexion} alt="Profil connecté" className="profile-avatar-img" onContextMenu={e => e.preventDefault()} />
+                <img src={userData?.photo || btn_on_connexion} alt="Profil connecté" className="profile-avatar-img" onContextMenu={e => e.preventDefault()} />
                 <HiPencil
                   size={14}
                   color="black"
@@ -404,7 +404,7 @@ if (fieldKey === 'email') {
                       onClick={() => fileInputRef.current && fileInputRef.current.click()}
                       title="Permet de cliquer-glisser ta photo directement pour l'ajouter à ton profil"
                     >
-                      <p style={{ fontSize: '13px' }}>
+                      <p>
                         Glisser ma photo
                         <br />
                         <span className="avatar-upload-optional">(Optionnel)</span>

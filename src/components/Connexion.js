@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
-import { getDatabase, ref, get, child } from "firebase/database";
+import { getDatabase, ref, get, child, update } from "firebase/database";
 import bcrypt from 'bcryptjs';
 import '../css/connexion.css';
 import '../css/button-width-height-global.css';
@@ -64,7 +64,19 @@ function Connexion() {
         if (passwordMatch) {
           setSuccessMessage("Vous êtes connecté !");
           setErrorMessage(null);
-          login(formData.pseudo); 
+
+          // Vérifie si le champ 'photo' existe déjà, sinon le crée avec une photo par défaut (migration douce)
+          if (userData.photo === undefined) {
+            try {
+              await update(ref(getDatabase(), `users/${formData.pseudo}`), {
+                photo: "https://res.cloudinary.com/r5zcotjd/image/upload/v1786371124/connexion_on.png"
+              });
+            } catch (err) {
+              console.error("Erreur lors de la création du champ photo :", err);
+            }
+          }
+
+          login(formData.pseudo);
           navigate('/home');
         } else {
           setErrorMessage("Ton mot de passe est incorrect");

@@ -6,6 +6,7 @@ import {
   Link,
   Navigate
 } from 'react-router-dom';
+import { getDatabase, ref, get } from 'firebase/database';
 
 import { FaPowerOff } from "react-icons/fa";
 
@@ -26,7 +27,7 @@ import btn_on_connexion  from '../medias/connexion_on.png';
 const LARGE_SCREEN_BREAKPOINT = 1009;
 
 function Header() {
-  const { isAuthenticated, logout } = useContext(AuthContext);
+  const { isAuthenticated, logout, pseudo } = useContext(AuthContext);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isHovered,      setIsHovered]      = useState(false);
@@ -35,6 +36,7 @@ function Header() {
     () => window.innerWidth >= LARGE_SCREEN_BREAKPOINT
   );
   const [showProfile, setShowProfile] = useState(false);
+  const [userPhoto, setUserPhoto] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -55,6 +57,29 @@ function Header() {
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, [isLargeScreen]);
+
+  // Récupère la photo de profil de l'utilisateur connecté depuis Firebase
+  useEffect(() => {
+    if (!isAuthenticated || !pseudo) {
+      setUserPhoto(null);
+      return;
+    }
+    const fetchUserPhoto = async () => {
+      try {
+        const db = getDatabase();
+        const snapshot = await get(ref(db, `users/${pseudo}/photo`));
+        if (snapshot.exists() && snapshot.val()) {
+          setUserPhoto(snapshot.val());
+        } else {
+          setUserPhoto(null);
+        }
+      } catch (err) {
+        console.error('Erreur récupération photo utilisateur :', err);
+        setUserPhoto(null);
+      }
+    };
+    fetchUserPhoto();
+  }, [isAuthenticated, pseudo]);
 
   const toggleDropdown = (e) => {
     if (!isLargeScreen) {
@@ -115,9 +140,10 @@ function Header() {
               >
                 <img
                   className="bloc_titre_boutonespace_image"
-                  src={btn_on_connexion}
+                  src={userPhoto || btn_on_connexion}
                   alt="bouton-space"
                   style={{ width: '100%', height: '100%' }}
+                  onContextMenu={e => e.preventDefault()}
                 />
               </div>
             ) : (
