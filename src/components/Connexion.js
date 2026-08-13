@@ -66,17 +66,17 @@ function Connexion() {
           setErrorMessage(null);
 
           // Vérifie si le champ 'photo' existe déjà, sinon le crée avec une photo par défaut (migration douce)
-          if (userData.photo === undefined) {
+          let userPhoto = userData.photo;
+          if (userPhoto === undefined) {
+            userPhoto = "https://res.cloudinary.com/r5zcotjd/image/upload/v1786371124/connexion_on.png";
             try {
-              await update(ref(getDatabase(), `users/${formData.pseudo}`), {
-                photo: "https://res.cloudinary.com/r5zcotjd/image/upload/v1786371124/connexion_on.png"
-              });
+              await update(ref(getDatabase(), `users/${formData.pseudo}`), { photo: userPhoto });
             } catch (err) {
               console.error("Erreur lors de la création du champ photo :", err);
             }
           }
 
-          login(formData.pseudo);
+          login(formData.pseudo, userPhoto);
           navigate('/home');
         } else {
           setErrorMessage("Ton mot de passe est incorrect");

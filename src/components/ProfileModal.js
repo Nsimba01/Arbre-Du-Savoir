@@ -10,7 +10,7 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import '../css/ProfileModal.css';
 
 function ProfileModal({ onClose }) {
-  const { pseudo: pseudoContext, login } = useContext(AuthContext);
+  const { pseudo: pseudoContext, login, photo: photoContext, updatePhoto } = useContext(AuthContext);
   const pseudo = pseudoContext || localStorage.getItem('pseudo') || '';
 
   const [userData, setUserData] = useState(null);
@@ -386,7 +386,7 @@ if (fieldKey === 'email') {
             <div className="profile-body">
 
               <div className="profile-avatar">
-                <img src={userData?.photo || btn_on_connexion} alt="Profil connecté" className="profile-avatar-img" onContextMenu={e => e.preventDefault()} />
+                <img src={photoContext || userData?.photo || btn_on_connexion} alt="Profil connecté" className="profile-avatar-img" onContextMenu={e => e.preventDefault()} />
                 <HiPencil
                   size={14}
                   color="black"
