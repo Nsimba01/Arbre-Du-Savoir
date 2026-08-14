@@ -33,6 +33,7 @@ function ProfileModal({ onClose }) {
 
   // --- Upload avatar (glisser-déposer / parcourir) ---
   const [showAvatarUpload, setShowAvatarUpload] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const fileInputRef = React.useRef(null);
   const avatarPopupRef = React.useRef(null);
 
@@ -316,24 +317,36 @@ if (fieldKey === 'email') {
     e.preventDefault();
   };
 
+  // Crée un aperçu local (sans upload) à partir d'un fichier, et libère l'ancien aperçu s'il existe
+  const generatePreview = (file) => {
+    if (!file || !file.type.startsWith('image/')) return;
+    setPreviewUrl(prevUrl => {
+      if (prevUrl) URL.revokeObjectURL(prevUrl);
+      return URL.createObjectURL(file);
+    });
+    // TODO : déclencher ici (ou via un bouton "Confirmer" séparé) l'upload réel vers Firebase Storage / Cloudinary,
+    // puis appeler updatePhoto(nouvelleUrl) une fois l'upload terminé pour synchroniser le contexte global.
+  };
+
   const handleDrop = (e) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
-    if (file) {
-      // TODO : traiter l'upload du fichier (ex: envoi vers Firebase Storage)
-      console.log('Fichier déposé :', file);
-    }
+    generatePreview(file);
     setShowAvatarUpload(false);
   };
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      // TODO : traiter l'upload du fichier (ex: envoi vers Firebase Storage)
-      console.log('Fichier sélectionné :', file);
-    }
+    generatePreview(file);
     setShowAvatarUpload(false);
   };
+
+  // Libère l'URL d'aperçu (mémoire navigateur) quand le composant est démonté ou que l'aperçu change
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   const passwordsMatch = confirmPassword === (pendingChanges['password'] || '');
   const age = userData?.dateNaissance ? Math.floor((new Date() - new Date(userData.dateNaissance)) / (365.25 * 24 * 60 * 60 * 1000)) : null;
@@ -386,7 +399,7 @@ if (fieldKey === 'email') {
             <div className="profile-body">
 
               <div className="profile-avatar">
-                <img src={photoContext || userData?.photo || btn_on_connexion} alt="Profil connecté" className="profile-avatar-img" onContextMenu={e => e.preventDefault()} />
+                <img src={previewUrl || photoContext || userData?.photo || btn_on_connexion} alt="Profil connecté" className="profile-avatar-img" onContextMenu={e => e.preventDefault()} />
                 <HiPencil
                   size={14}
                   color="black"
