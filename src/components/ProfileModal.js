@@ -31,9 +31,11 @@ function ProfileModal({ onClose }) {
   const [emailValidation, setEmailValidation] = useState(false);
   const pseudoTimeoutRef = React.useRef(null);
 
-  // --- Upload avatar (glisser-déposer / parcourir) ---
+  // --- Upload avatar ---
   const [showAvatarUpload, setShowAvatarUpload] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [pendingAvatar, setPendingAvatar] = useState(null); // NOUVEAU : Stocke le fichier image en attente
+  
   const fileInputRef = React.useRef(null);
   const avatarPopupRef = React.useRef(null);
 
@@ -53,7 +55,6 @@ function ProfileModal({ onClose }) {
     fetchUser();
   }, [pseudo]);
 
-  // Ferme le popup d'upload avatar si on clique en dehors
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (avatarPopupRef.current && !avatarPopupRef.current.contains(e.target)) {
@@ -103,6 +104,10 @@ function ProfileModal({ onClose }) {
     setPasswordValidation({ length: false, uppercase: false, number: false });
     setPseudoValidation({ length: false, available: false, checking: false });
     setEmailValidation(false);
+    
+    // NOUVEAU : Réinitialiser l'image en attente
+    setPendingAvatar(null);
+    setPreviewUrl(null); 
   };
 
   const fieldLabels = {
@@ -155,7 +160,19 @@ function ProfileModal({ onClose }) {
         changedFields.push('password');
       }
 
-      // Logique email : Déterminer où envoyer
+      // NOUVEAU : Gestion de l'enregistrement de l'avatar
+      if (pendingAvatar) {
+        // TODO: Mettez ici la logique d'upload vers Firebase Storage (ou Cloudinary, etc.)
+        // Exemple schématique :
+        // const storageRef = refStorage(getStorage(), `avatars/${pseudo}`);
+        // await uploadBytes(storageRef, pendingAvatar);
+        // const photoUrl = await getDownloadURL(storageRef);
+        // updates['photo'] = photoUrl;
+        // updatePhoto(photoUrl); // Mise à jour du context global si nécessaire
+        
+        changedFields.push('photo');
+      }
+
       const oldEmail = userData?.email;
       const newEmail = pendingChanges['email'];
       const isEmailChanging = newEmail && newEmail !== oldEmail;
@@ -171,7 +188,6 @@ function ProfileModal({ onClose }) {
         await Promise.all(promises);
       };
 
-      // --- Changement de pseudo ---
       if (pendingChanges['pseudo']) {
         const newPseudo = pendingChanges['pseudo'];
         const snapshot = await get(ref(db, `users/${newPseudo}`));
@@ -195,8 +211,11 @@ function ProfileModal({ onClose }) {
       }
 
       // --- Autres champs sans changement de pseudo ---
-      await update(ref(db, `users/${pseudo}`), updates);
-      setUserData(prev => ({ ...prev, ...updates }));
+      // Si la variable updates n'est pas vide (champs ou avatar)
+      if (Object.keys(updates).length > 0) {
+        await update(ref(db, `users/${pseudo}`), updates);
+        setUserData(prev => ({ ...prev, ...updates }));
+      }
 
       await notifyEmails(pseudo);
 
@@ -212,6 +231,7 @@ function ProfileModal({ onClose }) {
   };
 
   const validateNewValue = (fieldKey, value) => {
+    // ... [le code de validateNewValue reste strictement identique] ...
     if (fieldKey === 'password') {
       setPasswordValidation({
         length: value.length >= 10,
@@ -243,6 +263,7 @@ function ProfileModal({ onClose }) {
   };
 
   const handlePendingChange = (fieldKey, value) => {
+    // ... [le code de handlePendingChange reste strictement identique] ...
     let formattedValue = value;
     if (fieldKey === 'nom') formattedValue = value.trim().toUpperCase();
     if (fieldKey === 'prenom') {
@@ -258,9 +279,8 @@ function ProfileModal({ onClose }) {
   };
 
   const renderValidationMessage = (fieldKey) => {
+    // ... [le code de renderValidationMessage reste strictement identique] ...
     if (newFieldFocused !== fieldKey) return null;
-
-
     if (fieldKey === 'password') {
           const pwdEmpty = (pendingChanges['password'] || '').length === 0;
           const dot = (color) => <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: color, marginRight: '6px' }} />;
@@ -283,12 +303,10 @@ function ProfileModal({ onClose }) {
   return (
     <div className="validation-message" aria-live="polite">
       <span style={{ color: lengthColor }}>{dot(lengthColor)}Au moins 5 caractères</span><br />
-
             <span style={{ color: availableColor }}>
                   {dot(availableColor)}
                   {pseudoValidation.checking ? 'Vérification en cours...' : 'Pseudo disponible'}
             </span>
-
     </div>
   );
 }
@@ -305,9 +323,7 @@ if (fieldKey === 'email') {
     return null;
   };
 
-  // --- Handlers upload avatar ---
   const handleAvatarEditClick = () => {
-    // Le popup ne s'ouvre que sur écran > 480px (mobile exclu)
     if (window.innerWidth > 480) {
       setShowAvatarUpload(prev => !prev);
     }
@@ -317,15 +333,14 @@ if (fieldKey === 'email') {
     e.preventDefault();
   };
 
-  // Crée un aperçu local (sans upload) à partir d'un fichier, et libère l'ancien aperçu s'il existe
   const generatePreview = (file) => {
     if (!file || !file.type.startsWith('image/')) return;
     setPreviewUrl(prevUrl => {
       if (prevUrl) URL.revokeObjectURL(prevUrl);
       return URL.createObjectURL(file);
     });
-    // TODO : déclencher ici (ou via un bouton "Confirmer" séparé) l'upload réel vers Firebase Storage / Cloudinary,
-    // puis appeler updatePhoto(nouvelleUrl) une fois l'upload terminé pour synchroniser le contexte global.
+    // NOUVEAU : On enregistre le fichier dans l'état local comme un changement en attente
+    setPendingAvatar(file);
   };
 
   const handleDrop = (e) => {
@@ -341,7 +356,6 @@ if (fieldKey === 'email') {
     setShowAvatarUpload(false);
   };
 
-  // Libère l'URL d'aperçu (mémoire navigateur) quand le composant est démonté ou que l'aperçu change
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -361,7 +375,8 @@ if (fieldKey === 'email') {
     { label: 'Mail', value: userData?.email || '—', fieldKey: 'email', type: 'email' },
   ];
 
-  const hasPendingChanges = Object.keys(pendingChanges).length > 0;
+  // NOUVEAU : On affiche le bouton de sauvegarde si pendingChanges contient quelque chose OU si un pendingAvatar est présent
+  const hasPendingChanges = Object.keys(pendingChanges).length > 0 || pendingAvatar !== null;
 
   return (
     <div className="profile-overlay" onClick={handleOverlayClick} role="dialog" aria-modal="true" aria-label="Profil utilisateur">
@@ -385,14 +400,12 @@ if (fieldKey === 'email') {
                         fontWeight: 'bold',
                         color: saveMessage.startsWith('La mise à jour') ? 'RGB(51,204,51)' : 'red',
                       }}
-
                        title="Masquer le message d'information"
                     >
                       ✕
               </span>
   </p>
 )}
-
 
             </div>
             <div className="profile-divider" />
@@ -466,7 +479,7 @@ if (fieldKey === 'email') {
                           <div style={{ position: 'relative', flex: 1 }}>
 
                           <input type={masked ? (showCurrentPassword ? 'text' : 'password') : 'text'} value={value === '—' ? '' : value} disabled title={label} className="profile-edit-input profile-edit-input--disabled" style={{ width: '100%', paddingRight: masked ? '32px' : '8px', boxSizing: 'border-box' }} />
-                           {masked && (
+                            {masked && (
                               <span onClick={() => setShowCurrentPassword(p => !p)} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', fontSize: '15px' }}>
                                 {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
                               </span>
@@ -485,7 +498,6 @@ if (fieldKey === 'email') {
                             ) : (
 
                               <input type={masked ? (showNewPassword ? 'text' : 'password') : (type || 'text')} className="profile-edit-input" placeholder={['Pseudo', 'Prénom', 'Mail', 'Mot de passe', 'Nom'].includes(label) ? '' : `Nouveau ${label.toLowerCase()}`} value={pendingChanges[fieldKey] || ''} onChange={e => handlePendingChange(fieldKey, e.target.value)} onFocus={() => setNewFieldFocused(fieldKey)} onBlur={() => setNewFieldFocused(null)} title={label} style={{ width: '100%', paddingRight: masked ? '32px' : '8px', boxSizing: 'border-box' }} />
-
 
                            )}
                             {masked && (
