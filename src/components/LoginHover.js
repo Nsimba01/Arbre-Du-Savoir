@@ -4,7 +4,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { validatePassword, validatePseudo } from './validationUtils';
 import { AuthContext } from './AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { getDatabase, ref, get } from 'firebase/database';
+import { getDatabase, ref, get, update } from 'firebase/database';
 import bcrypt from 'bcryptjs';
 import '../css/button-width-height-global.css';
 
@@ -64,7 +64,21 @@ function LoginHover() {
         if (passwordMatch) {
           setSuccessMessage("Vous êtes connecté !");
           setErrorMessage(null);
-          login(formData.username); 
+
+          // Vérifie si le champ 'uid' existe déjà, sinon le crée (migration douce, comme dans Connexion.js)
+          // Ce uid sert d'identifiant stable, indépendant du pseudo (utilisé ensuite comme dossier Cloudinary)
+          let userUid = userData.uid;
+          if (userUid === undefined) {
+            userUid = crypto.randomUUID();
+            try {
+              await update(ref(db, `users/${formData.username}`), { uid: userUid });
+            } catch (err) {
+              console.error("Erreur lors de la création du champ uid :", err);
+            }
+          }
+
+          // On transmet la photo enregistrée en base pour éviter qu'elle soit écrasée par défaut
+          login(formData.username, userData.photo || '', userUid);
           navigate('/home');
         } else {
           setErrorMessage("Ton mot de passe est incorrect");

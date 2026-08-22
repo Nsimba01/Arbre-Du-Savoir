@@ -9,8 +9,50 @@ import { HiPencil } from 'react-icons/hi';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import '../css/ProfileModal.css';
 
+// --- Config Cloudinary ---
+const CLOUDINARY_CLOUD_NAME = 'r5zcotjd';
+const CLOUDINARY_UPLOAD_PRESET = 'profil_users';
+
+// Envoie le fichier à Cloudinary et retourne l'URL sécurisée de l'image hébergée.
+// Le fichier est rangé dans un dossier basé sur le uid de l'utilisateur (stable,
+// indépendant du pseudo), pour éviter que les photos se retrouvent éparpillées
+// si l'utilisateur change de pseudo par la suite.
+//
+// NOTE: Le compte Cloudinary utilise le "Dynamic Folder Mode" (nouveau système),
+// il faut donc utiliser le paramètre 'asset_folder' et non l'ancien 'folder'
+// (legacy), sinon Cloudinary ignore silencieusement le dossier envoyé.
+const uploadPhotoToCloudinary = async (file, uid, pseudo) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+  if (uid) {
+    formData.append('asset_folder', uid);
+    // NOTE: on ne peut PAS fixer un public_id identique à chaque upload ici,
+    // car Cloudinary interdit "overwrite: true" sur les presets non signés.
+    // Sans overwrite, un upload vers un public_id déjà existant est ignoré
+    // et Cloudinary renvoie l'ancienne photo inchangée (bug déjà rencontré).
+    // On laisse donc Cloudinary générer un public_id unique à chaque upload
+    // (comportement par défaut du preset). Cela signifie que d'anciennes
+    // photos s'accumulent dans le dossier du uid : un nettoyage périodique
+    // (manuel via Media Library, ou script local signé) reste nécessaire.
+    formData.append('context', `pseudo=${pseudo || ''}|uid=${uid}`);
+  }
+
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+    { method: 'POST', body: formData }
+  );
+
+  if (!response.ok) {
+    throw new Error('Échec de l\'upload de la photo sur Cloudinary');
+  }
+
+  const data = await response.json();
+  return data.secure_url;
+};
+
 function ProfileModal({ onClose }) {
-  const { pseudo: pseudoContext, login, photo: photoContext, updatePhoto } = useContext(AuthContext);
+  const { pseudo: pseudoContext, login, photo: photoContext, updatePhoto, uid } = useContext(AuthContext);
   const pseudo = pseudoContext || localStorage.getItem('pseudo') || '';
 
   const [userData, setUserData] = useState(null);
@@ -34,8 +76,8 @@ function ProfileModal({ onClose }) {
   // --- Upload avatar ---
   const [showAvatarUpload, setShowAvatarUpload] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
-  const [pendingAvatar, setPendingAvatar] = useState(null); // NOUVEAU : Stocke le fichier image en attente
-  
+  const [pendingAvatar, setPendingAvatar] = useState(null); // Stocke le fichier image en attente
+
   const fileInputRef = React.useRef(null);
   const avatarPopupRef = React.useRef(null);
 
@@ -104,10 +146,10 @@ function ProfileModal({ onClose }) {
     setPasswordValidation({ length: false, uppercase: false, number: false });
     setPseudoValidation({ length: false, available: false, checking: false });
     setEmailValidation(false);
-    
-    // NOUVEAU : Réinitialiser l'image en attente
+
+    // Réinitialiser l'image en attente
     setPendingAvatar(null);
-    setPreviewUrl(null); 
+    setPreviewUrl(null);
   };
 
   const fieldLabels = {
@@ -118,6 +160,7 @@ function ProfileModal({ onClose }) {
     dateNaissance: 'Date de naissance',
     password: 'Mot de passe',
     pseudo: 'Pseudo',
+    photo: 'Photo de profil',
   };
 
   const sendProfileUpdateEmail = async (targetEmail, targetPseudo, changedFields) => {
@@ -160,17 +203,19 @@ function ProfileModal({ onClose }) {
         changedFields.push('password');
       }
 
-      // NOUVEAU : Gestion de l'enregistrement de l'avatar
+      // --- Gestion de l'enregistrement de l'avatar (upload réel vers Cloudinary) ---
+      let uploadedPhotoUrl = null;
       if (pendingAvatar) {
-        // TODO: Mettez ici la logique d'upload vers Firebase Storage (ou Cloudinary, etc.)
-        // Exemple schématique :
-        // const storageRef = refStorage(getStorage(), `avatars/${pseudo}`);
-        // await uploadBytes(storageRef, pendingAvatar);
-        // const photoUrl = await getDownloadURL(storageRef);
-        // updates['photo'] = photoUrl;
-        // updatePhoto(photoUrl); // Mise à jour du context global si nécessaire
-        
-        changedFields.push('photo');
+        try {
+          uploadedPhotoUrl = await uploadPhotoToCloudinary(pendingAvatar, uid, pseudo);
+          updates['photo'] = uploadedPhotoUrl;
+          changedFields.push('photo');
+        } catch (uploadErr) {
+          console.error('Erreur upload photo Cloudinary :', uploadErr);
+          setSaveMessage("Erreur lors de l'envoi de la photo. Réessaie.");
+          setIsSaving(false);
+          return;
+        }
       }
 
       const oldEmail = userData?.email;
@@ -200,8 +245,10 @@ function ProfileModal({ onClose }) {
         const currentData = { ...userData, ...updates };
         await set(ref(db, `users/${newPseudo}`), currentData);
         await remove(ref(db, `users/${pseudo}`));
-        login(newPseudo);
+        login(newPseudo, uploadedPhotoUrl || photoContext, uid);
         changedFields.push('pseudo');
+
+        if (uploadedPhotoUrl) updatePhoto(uploadedPhotoUrl);
 
         await notifyEmails(newPseudo);
         handleCancel();
@@ -215,6 +262,11 @@ function ProfileModal({ onClose }) {
       if (Object.keys(updates).length > 0) {
         await update(ref(db, `users/${pseudo}`), updates);
         setUserData(prev => ({ ...prev, ...updates }));
+      }
+
+      // Synchronise le contexte global (Header.js, etc.) avec la nouvelle photo
+      if (uploadedPhotoUrl) {
+        updatePhoto(uploadedPhotoUrl);
       }
 
       await notifyEmails(pseudo);
@@ -231,7 +283,6 @@ function ProfileModal({ onClose }) {
   };
 
   const validateNewValue = (fieldKey, value) => {
-    // ... [le code de validateNewValue reste strictement identique] ...
     if (fieldKey === 'password') {
       setPasswordValidation({
         length: value.length >= 10,
@@ -263,7 +314,6 @@ function ProfileModal({ onClose }) {
   };
 
   const handlePendingChange = (fieldKey, value) => {
-    // ... [le code de handlePendingChange reste strictement identique] ...
     let formattedValue = value;
     if (fieldKey === 'nom') formattedValue = value.trim().toUpperCase();
     if (fieldKey === 'prenom') {
@@ -279,7 +329,6 @@ function ProfileModal({ onClose }) {
   };
 
   const renderValidationMessage = (fieldKey) => {
-    // ... [le code de renderValidationMessage reste strictement identique] ...
     if (newFieldFocused !== fieldKey) return null;
     if (fieldKey === 'password') {
           const pwdEmpty = (pendingChanges['password'] || '').length === 0;
@@ -339,7 +388,7 @@ if (fieldKey === 'email') {
       if (prevUrl) URL.revokeObjectURL(prevUrl);
       return URL.createObjectURL(file);
     });
-    // NOUVEAU : On enregistre le fichier dans l'état local comme un changement en attente
+    // On enregistre le fichier dans l'état local comme un changement en attente
     setPendingAvatar(file);
   };
 
@@ -375,7 +424,7 @@ if (fieldKey === 'email') {
     { label: 'Mail', value: userData?.email || '—', fieldKey: 'email', type: 'email' },
   ];
 
-  // NOUVEAU : On affiche le bouton de sauvegarde si pendingChanges contient quelque chose OU si un pendingAvatar est présent
+  // On affiche le bouton de sauvegarde si pendingChanges contient quelque chose OU si un pendingAvatar est présent
   const hasPendingChanges = Object.keys(pendingChanges).length > 0 || pendingAvatar !== null;
 
   return (

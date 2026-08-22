@@ -75,7 +75,9 @@ function Header() {
     setIsHovered(false);
   };
 
-  const showDropdown = isLargeScreen ? isHovered : isDropdownOpen;
+  const showDropdown = isLargeScreen ? isHovered : isDropdownOpen; 
+
+  
 
   return (
     <Router>

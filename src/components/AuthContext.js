@@ -13,23 +13,30 @@ export const AuthProvider = ({ children }) => {
   const [photo, setPhoto] = useState(
     () => localStorage.getItem('photo') || ''
   );
+  const [uid, setUid] = useState(
+    () => localStorage.getItem('uid') || ''
+  );
 
-  const login = (userPseudo, userPhoto = '') => {
+  const login = (userPseudo, userPhoto = '', userUid = '') => {
     setIsAuthenticated(true);
     setPseudo(userPseudo);
     setPhoto(userPhoto);
+    setUid(userUid);
     localStorage.setItem('isAuthenticated', 'true');
     localStorage.setItem('pseudo', userPseudo);
     localStorage.setItem('photo', userPhoto);
+    localStorage.setItem('uid', userUid);
   };
 
   const logout = () => {
     setIsAuthenticated(false);
     setPseudo('');
     setPhoto('');
+    setUid('');
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('pseudo');
     localStorage.removeItem('photo');
+    localStorage.removeItem('uid');
     window.location.href = '/home';
   };
 
@@ -40,7 +47,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, pseudo, photo, login, logout, updatePhoto }}>
+    <AuthContext.Provider value={{ isAuthenticated, pseudo, photo, uid, login, logout, updatePhoto }}>
       {children}
     </AuthContext.Provider>
   );

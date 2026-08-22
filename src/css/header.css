@@ -298,7 +298,7 @@
 .dropdown-content-wrapper {
     position: absolute;
     top: 100%;
-    right: 0;
+    right: -10px;
     left: auto;
     transform: none;
     z-index: 1000;
@@ -345,6 +345,7 @@
     padding: 12px 16px;
     z-index: 1;
     border-radius: 5px;
+    right: -10px;
     border: 1px solid ;
 }
 
@@ -358,6 +359,7 @@
         z-index: 1;
         margin-top: -10px;
         border-radius: 15px;
+       
     }
 }
 

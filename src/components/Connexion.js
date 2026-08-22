@@ -76,7 +76,19 @@ function Connexion() {
             }
           }
 
-          login(formData.pseudo, userPhoto);
+          // Vérifie si le champ 'uid' existe déjà, sinon le crée (migration douce, comme pour photo)
+          // Ce uid sert d'identifiant stable, indépendant du pseudo (utilisé ensuite comme dossier Cloudinary)
+          let userUid = userData.uid;
+          if (userUid === undefined) {
+            userUid = crypto.randomUUID();
+            try {
+              await update(ref(getDatabase(), `users/${formData.pseudo}`), { uid: userUid });
+            } catch (err) {
+              console.error("Erreur lors de la création du champ uid :", err);
+            }
+          }
+
+          login(formData.pseudo, userPhoto, userUid);
           navigate('/home');
         } else {
           setErrorMessage("Ton mot de passe est incorrect");
