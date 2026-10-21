@@ -77,6 +77,7 @@
   },
   "scripts": {
     "start": "node scripts/start.js",
+    "start:https": "cross-env HTTPS=true node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js"
   },
@@ -153,5 +154,8 @@
     "presets": [
       "react-app"
     ]
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0"
   }
 }
