@@ -345,9 +345,28 @@
     padding: 12px 16px;
     z-index: 1;
     border-radius: 5px;
-
+    right: -10px;
     border: 1px solid ;
 }
+
+@media screen and (max-width: 480px) {
+
+    .dropdown-content-deconnexion {
+
+            display: block;
+            position: relative;
+            background-color: rgb(153, 102, 51);
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            padding: 12px 16px;
+            z-index: 1;
+            border-radius: 5px;
+            right: -1px;
+            border: 1px solid ;
+
+
+    }
+}
+
 
 @media screen and (min-width: 1009px) and (max-width: 1920px) {
     .dropdown-content-deconnexion {
