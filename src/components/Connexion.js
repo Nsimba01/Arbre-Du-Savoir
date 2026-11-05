@@ -8,6 +8,17 @@ import '../css/button-width-height-global.css';
 import { AuthContext } from './AuthContext';
 import { validatePassword, validatePseudo } from './validationUtils';
 
+// Construit l'URL d'affichage à partir de ce qui est stocké dans Firebase.
+//  - nouveau format : un public_id  -> on reconstruit l'URL
+//  - ancien format  : une URL complète (commence par http) -> renvoyée telle quelle
+//  - valeur vide    : null
+const CLOUDINARY_CLOUD_NAME = 'r5zcotjd';
+const buildPhotoUrl = (value) => {
+  if (!value) return null;
+  if (value.startsWith('http')) return value;
+  return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/c_fill,g_face,w_400,h_400,f_auto,q_auto/${value}`;
+};
+
 function Connexion() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -88,7 +99,8 @@ function Connexion() {
             }
           }
 
-          login(formData.pseudo, userPhoto, userUid);
+          // On transmet l'URL complète au contexte (Header, etc.)
+          login(formData.pseudo, buildPhotoUrl(userPhoto) || '', userUid);
           navigate('/home');
         } else {
           setErrorMessage("Ton mot de passe est incorrect");

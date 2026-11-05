@@ -8,6 +8,17 @@ import { getDatabase, ref, get, update } from 'firebase/database';
 import bcrypt from 'bcryptjs';
 import '../css/button-width-height-global.css';
 
+// Construit l'URL d'affichage à partir de ce qui est stocké dans Firebase.
+//  - nouveau format : un public_id  -> on reconstruit l'URL
+//  - ancien format  : une URL complète (commence par http) -> renvoyée telle quelle
+//  - valeur vide    : null
+const CLOUDINARY_CLOUD_NAME = 'r5zcotjd';
+const buildPhotoUrl = (value) => {
+  if (!value) return null;
+  if (value.startsWith('http')) return value;
+  return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/c_fill,g_face,w_400,h_400,f_auto,q_auto/${value}`;
+};
+
 function LoginHover() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -77,8 +88,8 @@ function LoginHover() {
             }
           }
 
-          // On transmet la photo enregistrée en base pour éviter qu'elle soit écrasée par défaut
-          login(formData.username, userData.photo || '', userUid);
+          // On transmet l'URL complète de la photo au contexte (Header, etc.)
+          login(formData.username, buildPhotoUrl(userData.photo) || '', userUid);
           navigate('/home');
         } else {
           setErrorMessage("Ton mot de passe est incorrect");

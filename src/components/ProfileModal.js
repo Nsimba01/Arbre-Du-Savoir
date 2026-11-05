@@ -13,28 +13,33 @@ import '../css/ProfileModal.css';
 const CLOUDINARY_CLOUD_NAME = 'r5zcotjd';
 const CLOUDINARY_UPLOAD_PRESET = 'profil_users';
 
-// Envoie le fichier à Cloudinary et retourne l'URL sécurisée de l'image hébergée.
+// Construit l'URL d'affichage à partir de ce qui est stocké dans Firebase.
+//  - nouveau format : un public_id  -> on reconstruit l'URL
+//  - ancien format  : une URL complète (commence par http) -> renvoyée telle quelle
+//  - valeur vide    : null
+const buildPhotoUrl = (value) => {
+  if (!value) return null;
+  if (value.startsWith('http')) return value;
+  return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/c_fill,g_face,w_400,h_400,f_auto,q_auto/${value}`;
+};
+
+// Envoie le fichier à Cloudinary et retourne le public_id de l'image hébergée
+// (et non l'URL complète : l'URL est reconstruite à l'affichage via buildPhotoUrl).
 // Le fichier est rangé dans un dossier basé sur le uid de l'utilisateur (stable,
-// indépendant du pseudo), pour éviter que les photos se retrouvent éparpillées
-// si l'utilisateur change de pseudo par la suite.
+// indépendant du pseudo).
 //
 // NOTE: Le compte Cloudinary utilise le "Dynamic Folder Mode" (nouveau système),
-// il faut donc utiliser le paramètre 'asset_folder' et non l'ancien 'folder'
-// (legacy), sinon Cloudinary ignore silencieusement le dossier envoyé.
+// il faut donc utiliser le paramètre 'asset_folder' et non l'ancien 'folder'.
+//
+// NOTE: Cloudinary génère un public_id unique et aléatoire à chaque upload
+// (comportement du preset, sans overwrite). D'anciennes photos s'accumulent
+// donc dans le dossier du uid : un nettoyage périodique reste nécessaire.
 const uploadPhotoToCloudinary = async (file, uid, pseudo) => {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
   if (uid) {
     formData.append('asset_folder', uid);
-    // NOTE: on ne peut PAS fixer un public_id identique à chaque upload ici,
-    // car Cloudinary interdit "overwrite: true" sur les presets non signés.
-    // Sans overwrite, un upload vers un public_id déjà existant est ignoré
-    // et Cloudinary renvoie l'ancienne photo inchangée (bug déjà rencontré).
-    // On laisse donc Cloudinary générer un public_id unique à chaque upload
-    // (comportement par défaut du preset). Cela signifie que d'anciennes
-    // photos s'accumulent dans le dossier du uid : un nettoyage périodique
-    // (manuel via Media Library, ou script local signé) reste nécessaire.
     formData.append('context', `pseudo=${pseudo || ''}|uid=${uid}`);
   }
 
@@ -48,7 +53,7 @@ const uploadPhotoToCloudinary = async (file, uid, pseudo) => {
   }
 
   const data = await response.json();
-  return data.secure_url;
+  return data.public_id;
 };
 
 function ProfileModal({ onClose }) {
@@ -204,11 +209,14 @@ function ProfileModal({ onClose }) {
       }
 
       // --- Gestion de l'enregistrement de l'avatar (upload réel vers Cloudinary) ---
+      // Firebase ne stocke que le public_id ; l'URL complète (uploadedPhotoUrl)
+      // sert uniquement au contexte global (Header, etc.).
       let uploadedPhotoUrl = null;
       if (pendingAvatar) {
         try {
-          uploadedPhotoUrl = await uploadPhotoToCloudinary(pendingAvatar, uid, pseudo);
-          updates['photo'] = uploadedPhotoUrl;
+          const publicId = await uploadPhotoToCloudinary(pendingAvatar, uid, pseudo);
+          uploadedPhotoUrl = buildPhotoUrl(publicId);
+          updates['photo'] = publicId;
           changedFields.push('photo');
         } catch (uploadErr) {
           console.error('Erreur upload photo Cloudinary :', uploadErr);
@@ -258,7 +266,6 @@ function ProfileModal({ onClose }) {
       }
 
       // --- Autres champs sans changement de pseudo ---
-      // Si la variable updates n'est pas vide (champs ou avatar)
       if (Object.keys(updates).length > 0) {
         await update(ref(db, `users/${pseudo}`), updates);
         setUserData(prev => ({ ...prev, ...updates }));
@@ -331,44 +338,44 @@ function ProfileModal({ onClose }) {
   const renderValidationMessage = (fieldKey) => {
     if (newFieldFocused !== fieldKey) return null;
     if (fieldKey === 'password') {
-          const pwdEmpty = (pendingChanges['password'] || '').length === 0;
-          const dot = (color) => <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: color, marginRight: '6px' }} />;
-          const lengthColor   = passwordValidation.length    ? 'RGB(51,204,51)' : pwdEmpty ? 'black' : 'red';
-          const upperColor    = passwordValidation.uppercase ? 'RGB(51,204,51)' : pwdEmpty ? 'black' : 'red';
-          const numberColor   = passwordValidation.number    ? 'RGB(51,204,51)' : pwdEmpty ? 'black' : 'red';
-          return (
-            <div className="validation-message" aria-live="polite">
-              <span style={{ color: lengthColor }}>{dot(lengthColor)}Au moins 10 caractères</span><br />
-              <span style={{ color: upperColor }}>{dot(upperColor)}Au moins 1 majuscule</span><br />
-              <span style={{ color: numberColor }}>{dot(numberColor)}Au moins 1 chiffre</span>
-            </div>
-          );
-        }
-   if (fieldKey === 'pseudo') {
-  const dot = (color) => <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: color, marginRight: '6px' }} />;
-  const pseudoEmpty    = (pendingChanges['pseudo'] || '').length === 0;
-  const lengthColor    = pseudoValidation.length    ? 'RGB(51,204,51)' : pseudoEmpty ? 'black' : 'red';
-  const availableColor = pseudoValidation.available ? 'RGB(51,204,51)' : pseudoEmpty ? 'black' : 'red';
-  return (
-    <div className="validation-message" aria-live="polite">
-      <span style={{ color: lengthColor }}>{dot(lengthColor)}Au moins 5 caractères</span><br />
-            <span style={{ color: availableColor }}>
-                  {dot(availableColor)}
-                  {pseudoValidation.checking ? 'Vérification en cours...' : 'Pseudo disponible'}
-            </span>
-    </div>
-  );
-}
-if (fieldKey === 'email') {
-  const dot = (color) => <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: color, marginRight: '6px' }} />;
-  const emailEmpty = (pendingChanges['email'] || '').length === 0;
-  const emailColor = emailValidation ? 'RGB(51,204,51)' : emailEmpty ? 'black' : 'red';
-  return (
-    <div className="validation-message" aria-live="polite">
-      <span style={{ color: emailColor }}>{dot(emailColor)}Une adresse mail</span>
-    </div>
-  );
-}
+      const pwdEmpty = (pendingChanges['password'] || '').length === 0;
+      const dot = (color) => <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: color, marginRight: '6px' }} />;
+      const lengthColor   = passwordValidation.length    ? 'RGB(51,204,51)' : pwdEmpty ? 'black' : 'red';
+      const upperColor    = passwordValidation.uppercase ? 'RGB(51,204,51)' : pwdEmpty ? 'black' : 'red';
+      const numberColor   = passwordValidation.number    ? 'RGB(51,204,51)' : pwdEmpty ? 'black' : 'red';
+      return (
+        <div className="validation-message" aria-live="polite">
+          <span style={{ color: lengthColor }}>{dot(lengthColor)}Au moins 10 caractères</span><br />
+          <span style={{ color: upperColor }}>{dot(upperColor)}Au moins 1 majuscule</span><br />
+          <span style={{ color: numberColor }}>{dot(numberColor)}Au moins 1 chiffre</span>
+        </div>
+      );
+    }
+    if (fieldKey === 'pseudo') {
+      const dot = (color) => <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: color, marginRight: '6px' }} />;
+      const pseudoEmpty    = (pendingChanges['pseudo'] || '').length === 0;
+      const lengthColor    = pseudoValidation.length    ? 'RGB(51,204,51)' : pseudoEmpty ? 'black' : 'red';
+      const availableColor = pseudoValidation.available ? 'RGB(51,204,51)' : pseudoEmpty ? 'black' : 'red';
+      return (
+        <div className="validation-message" aria-live="polite">
+          <span style={{ color: lengthColor }}>{dot(lengthColor)}Au moins 5 caractères</span><br />
+          <span style={{ color: availableColor }}>
+            {dot(availableColor)}
+            {pseudoValidation.checking ? 'Vérification en cours...' : 'Pseudo disponible'}
+          </span>
+        </div>
+      );
+    }
+    if (fieldKey === 'email') {
+      const dot = (color) => <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: color, marginRight: '6px' }} />;
+      const emailEmpty = (pendingChanges['email'] || '').length === 0;
+      const emailColor = emailValidation ? 'RGB(51,204,51)' : emailEmpty ? 'black' : 'red';
+      return (
+        <div className="validation-message" aria-live="polite">
+          <span style={{ color: emailColor }}>{dot(emailColor)}Une adresse mail</span>
+        </div>
+      );
+    }
     return null;
   };
 
@@ -438,30 +445,30 @@ if (fieldKey === 'email') {
             <div className="profile-header">
               <span className="profile-pseudo-title">{pseudo || '—'}</span>
 
-             {saveMessage && (
-                  <p style={{ color: saveMessage.startsWith('La mise à jour') ? 'RGB(51,204,51)' : 'red', margin: '8px 0 0', fontSize: '0.85rem', textAlign: 'center' }}>
-                    {saveMessage}
-                    <span
-                      onClick={() => setSaveMessage('')}
-                      style={{
-                        marginLeft: '6px',
-                        cursor: 'pointer',
-                        fontWeight: 'bold',
-                        color: saveMessage.startsWith('La mise à jour') ? 'RGB(51,204,51)' : 'red',
-                      }}
-                       title="Masquer le message d'information"
-                    >
-                      ✕
-              </span>
-  </p>
-)}
+              {saveMessage && (
+                <p style={{ color: saveMessage.startsWith('La mise à jour') ? 'RGB(51,204,51)' : 'red', margin: '8px 0 0', fontSize: '0.85rem', textAlign: 'center' }}>
+                  {saveMessage}
+                  <span
+                    onClick={() => setSaveMessage('')}
+                    style={{
+                      marginLeft: '6px',
+                      cursor: 'pointer',
+                      fontWeight: 'bold',
+                      color: saveMessage.startsWith('La mise à jour') ? 'RGB(51,204,51)' : 'red',
+                    }}
+                    title="Masquer le message d'information"
+                  >
+                    ✕
+                  </span>
+                </p>
+              )}
 
             </div>
             <div className="profile-divider" />
             <div className="profile-body">
 
               <div className="profile-avatar">
-                <img src={previewUrl || photoContext || userData?.photo || btn_on_connexion} alt="Profil connecté" className="profile-avatar-img" onContextMenu={e => e.preventDefault()} />
+                <img src={previewUrl || photoContext || buildPhotoUrl(userData?.photo) || btn_on_connexion} alt="Profil connecté" className="profile-avatar-img" onContextMenu={e => e.preventDefault()} />
                 <HiPencil
                   size={14}
                   color="black"
@@ -508,7 +515,6 @@ if (fieldKey === 'email') {
                 )}
               </div>
 
-              
               <div className="profile-info">
                 {fields.map(({ label, value, fieldKey, masked, type }) => (
                   <div key={label} className="profile-field-block">
@@ -527,7 +533,7 @@ if (fieldKey === 'email') {
                           <span className="profile-edit-label">Actuel </span>
                           <div style={{ position: 'relative', flex: 1 }}>
 
-                          <input type={masked ? (showCurrentPassword ? 'text' : 'password') : 'text'} value={value === '—' ? '' : value} disabled title={label} className="profile-edit-input profile-edit-input--disabled" style={{ width: '100%', paddingRight: masked ? '32px' : '8px', boxSizing: 'border-box' }} />
+                            <input type={masked ? (showCurrentPassword ? 'text' : 'password') : 'text'} value={value === '—' ? '' : value} disabled title={label} className="profile-edit-input profile-edit-input--disabled" style={{ width: '100%', paddingRight: masked ? '32px' : '8px', boxSizing: 'border-box' }} />
                             {masked && (
                               <span onClick={() => setShowCurrentPassword(p => !p)} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', fontSize: '15px' }}>
                                 {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
@@ -548,7 +554,7 @@ if (fieldKey === 'email') {
 
                               <input type={masked ? (showNewPassword ? 'text' : 'password') : (type || 'text')} className="profile-edit-input" placeholder={['Pseudo', 'Prénom', 'Mail', 'Mot de passe', 'Nom'].includes(label) ? '' : `Nouveau ${label.toLowerCase()}`} value={pendingChanges[fieldKey] || ''} onChange={e => handlePendingChange(fieldKey, e.target.value)} onFocus={() => setNewFieldFocused(fieldKey)} onBlur={() => setNewFieldFocused(null)} title={label} style={{ width: '100%', paddingRight: masked ? '32px' : '8px', boxSizing: 'border-box' }} />
 
-                           )}
+                            )}
                             {masked && (
                               <span onClick={() => setShowNewPassword(p => !p)} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', fontSize: '15px' }}>
                                 {showNewPassword ? <FaEyeSlash /> : <FaEye />}
@@ -570,14 +576,14 @@ if (fieldKey === 'email') {
                               </div>
                             </div>
 
-                              {confirmPasswordFocused && (
-                                <div className="validation-message" aria-live="polite">
-                                  <span style={{ color: confirmPassword.length === 0 ? 'black' : passwordsMatch ? 'RGB(51,204,51)' : 'red' }}>
-                                    <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: confirmPassword.length === 0 ? 'black' : passwordsMatch ? 'RGB(51,204,51)' : 'red', marginRight: '6px' }} />
-                                    {passwordsMatch && confirmPassword.length > 0 ? 'Les mots de passe correspondent' : 'Identique au nouveau mot de passe'}
-                                  </span>
-                                </div>
-                              )}
+                            {confirmPasswordFocused && (
+                              <div className="validation-message" aria-live="polite">
+                                <span style={{ color: confirmPassword.length === 0 ? 'black' : passwordsMatch ? 'RGB(51,204,51)' : 'red' }}>
+                                  <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: confirmPassword.length === 0 ? 'black' : passwordsMatch ? 'RGB(51,204,51)' : 'red', marginRight: '6px' }} />
+                                  {passwordsMatch && confirmPassword.length > 0 ? 'Les mots de passe correspondent' : 'Identique au nouveau mot de passe'}
+                                </span>
+                              </div>
+                            )}
 
                           </>
                         )}
