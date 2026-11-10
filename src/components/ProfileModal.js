@@ -381,7 +381,11 @@ function ProfileModal({ onClose }) {
 
   const handleAvatarEditClick = () => {
     if (window.innerWidth > 480) {
+      // Tablette / ordinateur : popup avec glisser-déposer
       setShowAvatarUpload(prev => !prev);
+    } else if (fileInputRef.current) {
+      // Smartphone : ouvre directement le sélecteur (galerie ou appareil photo)
+      fileInputRef.current.click();
     }
   };
 
@@ -477,6 +481,15 @@ function ProfileModal({ onClose }) {
                   title="Modifier la photo de profil"
                 />
 
+                {/* Input fichier toujours présent (hors popup) pour fonctionner aussi sur smartphone */}
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  style={{ display: 'none' }}
+                  onChange={handleFileSelect}
+                />
+
                 {showAvatarUpload && (
                   <div className="avatar-upload-popup" ref={avatarPopupRef}>
                     <div
@@ -504,13 +517,6 @@ function ProfileModal({ onClose }) {
                     >
                       📁 Importer ma photo
                     </button>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      ref={fileInputRef}
-                      style={{ display: 'none' }}
-                      onChange={handleFileSelect}
-                    />
                   </div>
                 )}
               </div>
