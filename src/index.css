@@ -119,3 +119,11 @@ video{
   }
 
   
+
+.formulaire .validation-message,
+.formulaire .validation-message span,
+.form-login .validation-message,
+.form-login .validation-message span,
+.form-login span {
+  font-family: 'Comic Neue', 'Comic Sans MS', 'Comic Sans', sans-serif;
+}

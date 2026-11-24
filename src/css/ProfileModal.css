@@ -230,7 +230,7 @@
 
 /* --- Messages de validation --- */
 
-.validation-message {
+.profile-modal .validation-message {
   font-size: 12px;
   line-height: 1.6;
   padding-left: 84px;
@@ -337,7 +337,7 @@
     font-size: 12px;
     min-width: 0;
   }
-  .validation-message {
+  .profile-modal .validation-message {
     padding-left: 76px;
   }
 }
@@ -423,4 +423,9 @@
   height: auto;
   margin: 8px auto 0;
   pointer-events: none;
+}
+
+.profile-modal,
+.profile-modal * {
+  font-family: 'Comic Neue', 'Comic Sans MS', 'Comic Sans', sans-serif;
 }
